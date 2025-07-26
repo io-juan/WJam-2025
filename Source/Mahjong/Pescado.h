@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InputActionValue.h"
 #include "GameFramework/Pawn.h"
 #include "Pescado.generated.h"
 
@@ -23,8 +24,16 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	//Methods
+	void FishMove(const FInputActionValue& Value);
+
+	void FishJump(const FInputActionValue& Value);
+
 	//Variables Core
 	int Health = 100;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int RollStrength = 2000;
 
 	// Components
 	UPROPERTY(VisibleAnywhere)
