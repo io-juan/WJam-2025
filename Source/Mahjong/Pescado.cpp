@@ -1,9 +1,16 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
+#pragma once
+
+#include "Pescado.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputMappingContext.h"
+#include "InputAction.h"
+#include "InputActionValue.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
-#include "Pescado.h"
 
 // Sets default values
 APescado::APescado()
@@ -19,8 +26,6 @@ APescado::APescado()
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	CameraComponent->SetupAttachment(SpringArm, FName("Socket"));
-
-	
 
 }
 
@@ -38,10 +43,31 @@ void APescado::Tick(float DeltaTime)
 
 }
 
+void APescado::FishMove(const FInputActionValue& Value)
+{
+	FVector2D Input = Value.Get<FVector2D>();
+
+	FVector Torque = FVector(Input.X * 5, Input.Y, 0) * RollStrength;
+	MeshPescado->AddTorqueInRadians(Torque, NAME_None, false);
+
+	UE_LOG(LogTemp, Display, TEXT("Entro"));
+}
+
+void APescado::FishJump(const FInputActionValue& Value)
+{
+
+}
+
 // Called to bind functionality to input
 void APescado::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	if (UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+		EnhancedInput->BindAction(IA_Move, ETriggerEvent::Triggered, this, &APescado::FishMove);
+		EnhancedInput->BindAction(IA_Jump, ETriggerEvent::Triggered, this, &APescado::FishJump);
+	}
 
 }
 
