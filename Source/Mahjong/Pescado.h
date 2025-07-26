@@ -32,6 +32,8 @@ public:
 	void ResetJumpCooldown();
 
 	//Variables Core
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int Health = 100;
 
 	FVector2D CachedMoveInput = FVector2D::ZeroVector;
