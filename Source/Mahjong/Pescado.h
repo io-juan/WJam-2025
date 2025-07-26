@@ -29,11 +29,35 @@ public:
 
 	void FishJump(const FInputActionValue& Value);
 
+	void ResetJumpCooldown();
+
 	//Variables Core
 	int Health = 100;
 
+	FVector2D CachedMoveInput = FVector2D::ZeroVector;
+	float CachedJumpInput = 0.0f;
+
+	bool bCanJump = true;
+
+	UPROPERTY(EditAnywhere, Category = "Jump")
+	float JumpCooldown = 3.0f;
+
+	FTimerHandle JumpCooldownTimer;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int RollStrength = 2000;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int JumpStrength = 200;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int MaxAngularVel = 10000;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float YTorqueMultiplier = 0.5f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float XTorqueMultiplier = 5.0f;
 
 	// Components
 	UPROPERTY(VisibleAnywhere)

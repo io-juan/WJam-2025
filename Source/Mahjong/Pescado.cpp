@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Pescado.h"
+#include "Components/StaticMeshComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
@@ -33,7 +34,7 @@ APescado::APescado()
 void APescado::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	MeshPescado->SetPhysicsMaxAngularVelocityInRadians(MaxAngularVel, false, NAME_None);
 }
 
 // Called every frame
@@ -41,21 +42,54 @@ void APescado::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// Apply Torque
+	if (!CachedMoveInput.IsNearlyZero())
+	{
+		FVector Direction = FVector(CachedMoveInput.X, CachedMoveInput.Y, 0.f).GetSafeNormal();
+		FVector Torque = Direction * RollStrength;
+
+		// Convert to local space
+		FVector LocalTorque = MeshPescado->GetComponentTransform().InverseTransformVectorNoScale(Torque);
+		LocalTorque.X *= XTorqueMultiplier;
+		LocalTorque.Y *= YTorqueMultiplier;
+		LocalTorque.Z = 0.f;
+
+		// Back to world space
+		FVector ScaledTorque = MeshPescado->GetComponentTransform().TransformVectorNoScale(LocalTorque);
+		MeshPescado->AddTorqueInRadians(ScaledTorque, NAME_None, false);
+
+		UE_LOG(LogTemp, Display, TEXT("Torque: %s"), *ScaledTorque.ToString());
+	}
+
+	// Apply Jump/Impulse
+	if (CachedJumpInput > 0.1f && bCanJump)
+	{
+		FVector Impulse = FVector(0, 0, CachedJumpInput * JumpStrength);
+		MeshPescado->AddImpulse(Impulse, NAME_None, true);
+
+		UE_LOG(LogTemp, Display, TEXT("Jump Impulse Applied: %s"), *Impulse.ToString());
+
+		bCanJump = false;
+		GetWorld()->GetTimerManager().SetTimer(JumpCooldownTimer, this, &APescado::ResetJumpCooldown, JumpCooldown, false);
+
+		CachedJumpInput = 0.f; // One-shot
+	}
+}
+
+void APescado::ResetJumpCooldown()
+{
+	bCanJump = true;
+	CachedJumpInput = 0.0f;
 }
 
 void APescado::FishMove(const FInputActionValue& Value)
 {
-	FVector2D Input = Value.Get<FVector2D>();
-
-	FVector Torque = FVector(Input.X * 5, Input.Y, 0) * RollStrength;
-	MeshPescado->AddTorqueInRadians(Torque, NAME_None, false);
-
-	UE_LOG(LogTemp, Display, TEXT("Entro"));
+	CachedMoveInput = Value.Get<FVector2D>();
 }
 
 void APescado::FishJump(const FInputActionValue& Value)
 {
-
+	CachedJumpInput = Value.Get<float>();
 }
 
 // Called to bind functionality to input
