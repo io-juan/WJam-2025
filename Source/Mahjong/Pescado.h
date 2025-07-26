@@ -23,6 +23,28 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	//Variables Core
+	int Health = 100;
+
+	// Components
+	UPROPERTY(VisibleAnywhere)
+	class UStaticMeshComponent* MeshPescado;
+
+	UPROPERTY(VisibleAnywhere)
+	class UCameraComponent* CameraComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	class USpringArmComponent* SpringArm;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UInputMappingContext* MappingContextMain;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UInputAction* IA_Move;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UInputAction* IA_Jump;
+
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
