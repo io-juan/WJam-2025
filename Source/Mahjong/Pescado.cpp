@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Pescado.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -19,7 +20,7 @@ APescado::APescado()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	MeshPescado = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshPescado"));
+	MeshPescado = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("MeshPescado"));
 	RootComponent = MeshPescado;
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
@@ -42,6 +43,8 @@ void APescado::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+
+
 	// Apply Torque
 	if (!CachedMoveInput.IsNearlyZero())
 	{
@@ -56,9 +59,15 @@ void APescado::Tick(float DeltaTime)
 
 		// Back to world space
 		FVector ScaledTorque = MeshPescado->GetComponentTransform().TransformVectorNoScale(LocalTorque);
-		MeshPescado->AddTorqueInRadians(ScaledTorque, NAME_None, false);
+		MeshPescado->AddTorqueInRadians(ScaledTorque, FName("Bone"), false);
 
 		UE_LOG(LogTemp, Display, TEXT("Torque: %s"), *ScaledTorque.ToString());
+
+		int HeightMultiplier = FMath::Clamp(GetActorLocation().Z / 100,0,100);
+		FVector ImpulseDir = FVector(CachedMoveInput.Y, -CachedMoveInput.X, 0);
+
+		MeshPescado->AddImpulse(ImpulseDir * ImpulseHorizontal * HeightMultiplier);
+
 	}
 
 	// Apply Jump/Impulse

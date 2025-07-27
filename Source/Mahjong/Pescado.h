@@ -36,7 +36,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int Health = 100;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int ImpulseHorizontal = 5;
+
 	FVector2D CachedMoveInput = FVector2D::ZeroVector;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	float CachedJumpInput = 0.0f;
 
 	bool bCanJump = true;
@@ -63,7 +68,7 @@ public:
 
 	// Components
 	UPROPERTY(VisibleAnywhere)
-	class UStaticMeshComponent* MeshPescado;
+	class USkeletalMeshComponent* MeshPescado;
 
 	UPROPERTY(VisibleAnywhere)
 	class UCameraComponent* CameraComponent;
