@@ -67,7 +67,7 @@ public:
 	float XTorqueMultiplier = 5.0f;
 
 	// Components
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USkeletalMeshComponent* MeshPescado;
 
 	UPROPERTY(VisibleAnywhere)
@@ -75,6 +75,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	class USpringArmComponent* SpringArm;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UAudioComponent* AudioComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UInputMappingContext* MappingContextMain;

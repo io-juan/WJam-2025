@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Pescado.h"
+#include "Components/AudioComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "EnhancedInputComponent.h"
@@ -25,6 +26,9 @@ APescado::APescado()
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(MeshPescado);
+
+	AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio"));
+	AudioComponent->SetupAttachment(MeshPescado);
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	CameraComponent->SetupAttachment(SpringArm, FName("Socket"));
@@ -75,6 +79,8 @@ void APescado::Tick(float DeltaTime)
 	{
 		FVector Impulse = FVector(0, 0, CachedJumpInput * JumpStrength);
 		MeshPescado->AddImpulse(Impulse, NAME_None, true);
+
+		AudioComponent->Play();
 
 		UE_LOG(LogTemp, Display, TEXT("Jump Impulse Applied: %s"), *Impulse.ToString());
 
