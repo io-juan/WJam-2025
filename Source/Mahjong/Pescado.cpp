@@ -65,8 +65,6 @@ void APescado::Tick(float DeltaTime)
 		FVector ScaledTorque = MeshPescado->GetComponentTransform().TransformVectorNoScale(LocalTorque);
 		MeshPescado->AddTorqueInRadians(ScaledTorque, FName("Bone"), false);
 
-		UE_LOG(LogTemp, Display, TEXT("Torque: %s"), *ScaledTorque.ToString());
-
 		int HeightMultiplier = FMath::Clamp(GetActorLocation().Z / 100,0,100);
 		FVector ImpulseDir = FVector(CachedMoveInput.Y, -CachedMoveInput.X, 0);
 
