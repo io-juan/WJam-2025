@@ -47,45 +47,46 @@ void APescado::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-
-
-	// Apply Torque
-	if (!CachedMoveInput.IsNearlyZero())
+	if (Health > 0) 
 	{
-		FVector Direction = FVector(CachedMoveInput.X, CachedMoveInput.Y, 0.f).GetSafeNormal();
-		FVector Torque = Direction * RollStrength;
+		// Apply Torque
+		if (!CachedMoveInput.IsNearlyZero())
+		{
+			FVector Direction = FVector(CachedMoveInput.X, CachedMoveInput.Y, 0.f).GetSafeNormal();
+			FVector Torque = Direction * RollStrength;
 
-		// Convert to local space
-		FVector LocalTorque = MeshPescado->GetComponentTransform().InverseTransformVectorNoScale(Torque);
-		LocalTorque.X *= XTorqueMultiplier;
-		LocalTorque.Y *= YTorqueMultiplier;
-		LocalTorque.Z = 0.f;
+			// Convert to local space
+			FVector LocalTorque = MeshPescado->GetComponentTransform().InverseTransformVectorNoScale(Torque);
+			LocalTorque.X *= XTorqueMultiplier;
+			LocalTorque.Y *= YTorqueMultiplier;
+			LocalTorque.Z = 0.f;
 
-		// Back to world space
-		FVector ScaledTorque = MeshPescado->GetComponentTransform().TransformVectorNoScale(LocalTorque);
-		MeshPescado->AddTorqueInRadians(ScaledTorque, FName("Bone"), false);
+			// Back to world space
+			FVector ScaledTorque = MeshPescado->GetComponentTransform().TransformVectorNoScale(LocalTorque);
+			MeshPescado->AddTorqueInRadians(ScaledTorque, FName("Bone"), false);
 
-		int HeightMultiplier = FMath::Clamp(GetActorLocation().Z / 100,0,100);
-		FVector ImpulseDir = FVector(CachedMoveInput.Y, -CachedMoveInput.X, 0);
+			int HeightMultiplier = FMath::Clamp(GetActorLocation().Z / 100, 0, 100);
+			FVector ImpulseDir = FVector(CachedMoveInput.Y, -CachedMoveInput.X, 0);
 
-		MeshPescado->AddImpulse(ImpulseDir * ImpulseHorizontal * HeightMultiplier);
+			MeshPescado->AddImpulse(ImpulseDir * ImpulseHorizontal * HeightMultiplier);
 
-	}
+		}
 
-	// Apply Jump/Impulse
-	if (CachedJumpInput > 0.1f && bCanJump)
-	{
-		FVector Impulse = FVector(0, 0, CachedJumpInput * JumpStrength);
-		MeshPescado->AddImpulse(Impulse, NAME_None, true);
+		// Apply Jump/Impulse
+		if (CachedJumpInput > 0.1f && bCanJump)
+		{
+			FVector Impulse = FVector(0, 0, CachedJumpInput * JumpStrength);
+			MeshPescado->AddImpulse(Impulse, NAME_None, true);
 
-		AudioComponent->Play();
+			AudioComponent->Play();
 
-		UE_LOG(LogTemp, Display, TEXT("Jump Impulse Applied: %s"), *Impulse.ToString());
+			UE_LOG(LogTemp, Display, TEXT("Jump Impulse Applied: %s"), *Impulse.ToString());
 
-		bCanJump = false;
-		GetWorld()->GetTimerManager().SetTimer(JumpCooldownTimer, this, &APescado::ResetJumpCooldown, JumpCooldown, false);
+			bCanJump = false;
+			GetWorld()->GetTimerManager().SetTimer(JumpCooldownTimer, this, &APescado::ResetJumpCooldown, JumpCooldown, false);
 
-		CachedJumpInput = 0.f; // One-shot
+			CachedJumpInput = 0.f; // One-shot
+		}
 	}
 }
 
